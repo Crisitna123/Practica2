@@ -1,0 +1,60 @@
+Usuario: usuario
+Contraseña: abc123.
+
+------------------------------
+
+SonarQube
+Terminal: sonar .sh start
+localhost:9000
+
+------------------------------
+Git
+Para descargar desde el terminal sin tener que descomprimir
+Terminal: git clone (url del proyecto)
+
+------------------------------
+Carpeta compartida
+Terminal: sudo cp -r /media/sf_PPSCompartida/Ascensor .
+	Esto es para copiar el proyecto
+
+	sudo chown -R usuario:usuario Ascensor/
+
+	sudo ls /media/sf_PPSCompartida/    ->>Para listar lo que hay dentro de la compartida
+	sudo chmod -R 755 Ascensor  ->>Para darle permisos
+
+------------------------------
+Para ejecutar los test
+	Con el terminal entramos con cd Ascensor/
+		hacemos ls
+		hacemos mvn test (la primera vez va a descargar muchas cosas
+	Con el eclipse
+		-click derecho sobre el AscensorTest dentro de src/test/java
+		- run as y seleccionamos lo que queremos
+
+------------------------------
+Tenemos en Ascensor.java un método llamado getPlantaMaxima(), si le cambiamos de public a private va a funcionar igual al ejecutar Reflexion.java
+	Tiene que dar 4 de resultado, si es así, ya habremos terminado la comprobación y tendremos que volver a poner public el método
+
+------------------------------
+Ir a la clase Test, hacer click derecho y darle a Run As JUnit Test
+
+------------------------------
+Ejecutamos los Maven test desde linea de comandos entrando en el terminal y ponemos:
+	cd Ascensor/
+	ls 
+	mvn test ->> Esto nos hace lo mismo que haciendo el Run As en e propio eclipse
+
+------------------------------
+Si hacemos mvn clean, al hacer ls en la carpeta Ascensor/ nos aparece solo src, cuando antes de hacerlo aparecía src y target
+
+Si hacemos mvn compile vuelve a aparecer la carpeta target
+
+Si hacemos mvn package ...
+
+------------------------------
+Si hacemos Maven Install en eclipse nos ahorramos tener que hacer los pasos anteriores en el terminal, ya lo hace todo directamente
+
+Para ver la explicación https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html (explicación de los ciclos de vida)
+
+------------------------------
+Se puede hacer mvn clean install (primero haría el clean y luego el install) ->> Se pueden poner varios juntos

@@ -1,0 +1,174 @@
+Todos los comandos hay que meterlos con sudo menos si metemos a nuestro usuario en docker
+docker run --rm hello-world
+	->> para probar si está funcionando
+docker creat
+	->> para crear un contenedor
+docker creat --name cont1
+	->> para ponerle el nombre
+docker creat -i -t --name cont1 alpine
+	->> le ponemos para que cree un bash, el nombre y la imagen
+docker image ls
+	->> para listar las imagenes
+docker ps -a
+	->> salen los contenedores que hay creados
+
+LA IMAGEN ES LA PLANTILLA PARA LOS CONTENEDORES
+
+docker rm cont2
+	->> borramos el contenerdor indicado (en vez del nombre se puede poner el id)
+docker start -i cont1
+	->> para lanzar el contenedor
+	# uname -a
+		->> dice el nombre (estamos dentro del contenedor)
+	# cat /etc/os-release
+		->> dice los datos del contenedor
+	# ls 
+		->> lista lo que hay dentro
+	# exit
+		->> para salir (se muere)
+docker stop cont1 -t 30
+	->> espera 30 segundos para echarte (por defecto son 10)
+docker run -it --name cont3 debian echo "hola"
+	->> se va a bajar la imagen de Debian, va a crear el contenedor, y va a ejecutar el echo "hola" y salir
+
+docker run -d --name cont4 debian tail -f /dev/null
+	->> tail -f se queda leyendo a ver quien escribe
+	->> -d indica que es modo demonio
+	->> el fichero /dev/null es un fichero vacío
+	->> se queda ahí hasta que lo pare
+docker ps
+	->> si lo hacemos justo después del anterior comando vamos viendo el tiempo que lleva funcionando y el comando que está ejecutando
+docker stop cont4
+	->> paramos el cont4 (hay que esperar 10 segundos)
+docker exec -it cont5 /bin/bash
+	->> para ponerlo en modo interactivo después de haberlo ya creado y que esté creado
+	->> estos servicios están preparados para hacer pocas cosas
+	->> tiene los puertos con un firewall asi que no me puedo conectar desde fuera a él
+docker run -dit -p 9000:80 --name cont6 httpd
+	->> le decimios que sea modo demonio y interactivo
+	->> -p indica el puerto 
+	->> vamos desde el navegador a localhost:9000 y lo que entre aquí lo manda al puerto 80 del contenedor
+	->> todo lo que llegue al puerto 9000 del anfitrión se redirige al puerto 80 del contenedor
+for i in `seq 1 100`; do docker run -dit -p $((9000+$i)):80 --name contenedor$i httpd; done
+	->> crea desde el puerto 1 hasta el puerto 100 enlazados con distintos nombres
+	->> crea 100 contenedores web con ese comando
+for i in `seq 1 100`; do docker rm --force contenedor$i; done
+	->> para eliminar todos los contenedores creados
+docker exec -ti cont6 /bin/bash
+	/usr/local/apache2 
+		->> entramos en esa carpeta
+		cd /htdocs
+			->> entramos en esa carpeta concreta
+			cat index.html
+				->> vemos que funciona
+			mkdir kaka
+			cd kaka
+			echo "hola" > index.html
+				->> vamos con el buscardor a localhost:9000/kaka/ y vemos que dice hola
+docker run --name mysql-1 -e MYSQL_ROOT_PASSWORD=MiPassword -d mysql
+	->> -e indica variables de entorno
+	->> creamos una base de datos de mysql con la password que nosotros queremos (después de -e)
+docker exec -it mysql-1 /bin/bash
+	->> entramos en mysql-1
+	mysql -u root -p
+	->> nos va a pedir la contraseña y así entramos en el servidor MySQL
+docker run --name mysql-2 -e MYSQL_ROOT_PASSWORD=MiPassword -v ~/Mysql-2:/var/lib/mysql -d mysql
+	->> mapeamos los datos de una carpeta del contenedor a una local
+	->> el ~ indica la carpeta home
+	->> después de crear esto, vamos a la carpeta y vemos que están los ficheros
+docker run -d -p 9000:9000 --restart always -v /var/run/docker.sock:/var/run/docker.sock -v /opt/container:/data portainer/portainer
+	->> creamos contenedor para el puerto 9000 
+	->> mapea las carpetas donde guarda los informes el docker
+	->>portainer nos dice que tenemos que dar un password de administrador (abc123.abc123.) y no le dejo que cree estadísticas
+		->> tengo como una administración online del docker
+		->> hacer Ctrl + F5 para recargar el navegador borrando la caché para poder entrar en portainer
+docker image
+	->> abre un menú con las distintas imagenes
+docker image ls
+	->> abre el listado de las imagenes que descargamos
+docker image rm httpd
+	->> borra todas las capas que haya de esa imagen
+docker image pull postgre:9.3.5
+	->> te descarga la imagen que queramos con la versión que le indicamos si la hay
+	->> si en la versión le ponemos "latest" descarga la última versión
+docker run --name registro -p 5000:5000 registry:2
+	->> crea un contenedor que es un registro, en el puerto 5000 llamado "registro"
+	->> como un repositorio
+docker image pull localhost:500/debian
+	->> descargamos la imagen de debian que haya subida en el repositorio creado anteriormente (localhost:5000)
+docker image tag debian localhost:5000/debian:latest
+	->> le pongo un tag a la imagen
+	->> sirve porque puedes tener varias versiones de la misma imagen
+	->> por defecto si no le pones un tag trabaja con la última versión
+dokcer image push localhost:5000/debian:latest
+	->> subo la imagen a nuestro repositorio que utiliza el puerto 5000 (por eso ponemos localhost:5000)
+docker image rm localhost:5000/debian:latest
+	->> le quita el tag y borra la imagen
+dokcer pull debian:stable
+	->> me baja una imagen de debian que esté estable
+docker run --name cont1 -it debian:stable bash
+	->> creamos y lanzamos un contenedor con debian
+	apt-get update
+	apt-get install -y apache2
+		->> para instalar apache2
+		->> -y para que no pida confirmación
+	rm -r /var/lib/apt/list/*
+		->> borra estos paquetes que no sirven de nada
+		->> le quita peso así al contenedor
+dokcer commit cont1 debapache
+	->> creamos una imagen de ese contenedor (cont1) con el nombre "debapache"
+docker rm cont1
+	->> borramos el contenedor
+docker run --name cont1 -it debapache bash
+	->> creamos un nuevo contenedor a partir de la imagen anterior
+	apt-get update
+	apt-get install -y git
+		->> instalamos git
+	cd /var/www/html/
+		->> entro en la carpeta en la que alamacena las webs
+	git clone https://github.com/mdn/html-examples
+		->> descara en esa carpeta lo que queremos
+docker commit cont1 debsitio
+		->> volvemos a crear una imagen del último cont1
+docker run --rm -p 8888:80 -d debsitio apachectl -DEFOREGROUNG
+		->> creamos un contenedor en el puerto 8888 que funciona como demonio con esa imagen
+
+
+Creamos una carpeta llamada "dockers" y dentro de ella creamos un documento en blanco llamado "Dockerfile"
+	DENTRO DEL DOCKERFILE
+		FROM ubuntu
+		WORKDIR /home
+			->> vete al directorio /home
+		Mirar el resto dentro del Dockerfile
+cd dockers
+	->> entro en la carpeta dockers
+	ls 
+		->> miramos los archivos que hay dentro (tiene que estar nuestro fichero)
+	docker build -t cont-gatos .
+		->> ejecutamos el fichero que hicimos
+	docker run -d -p 5000:5000 --name gatos1 cont-gatos
+		->> creamos un contenedor en el puerto 5000 llamado gatos1 con la imagen cont-gatos que funcione como modo demonio
+cd ..
+git clone https://github.com/dockersamples/example-voting-app
+	->> clonamos eso
+cd example-voting-app
+	->> entramos en esa carpeta
+	docker compose up -d
+		->> va construyendo lo necesario (imagenes, etc) y lo lanza (tarda bastante tiempo)
+	dokcer compose down
+		->> para el contenedor (y los borra)
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------
+hub.docker.com
+	->> repositorio donde ver todas las imágenes de docker que hay
+
+
+
